@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вакансія — Alexx Quality Work</title>
+  <meta name="description" content="Детальна інформація про вакансію. Офіційне легальне працевлаштування в ЄС.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./aqw-v3.css">
+  <style>
+    /* ── Vacancy page extras ── */
+    .vacancy-wrap {
+      padding: clamp(48px,7vw,96px) 0 clamp(64px,8vw,120px);
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 36px;
+      transition: color .2s;
+    }
+    .back-link:hover { color: var(--text); }
+
+    .vacancy-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 56px;
+      align-items: start;
+    }
+    .vacancy-main {}
+    .vacancy-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      background: rgba(0,113,227,.08);
+      border-radius: 999px;
+      padding: 6px 14px;
+      margin-bottom: 20px;
+    }
+    .vacancy-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1.1;
+      margin-bottom: 24px;
+    }
+    .vacancy-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .meta-icon {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--bg-2);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .meta-icon svg { width: 14px; height: 14px; }
+
+    .vacancy-cover {
+      width: 100%;
+      aspect-ratio: 16/8;
+      object-fit: cover;
+      border-radius: var(--r-xl);
+      margin-bottom: 40px;
+    }
+    .vacancy-description h4 {
+      font-size: 17px;
+      font-weight: 700;
+      margin: 28px 0 12px;
+    }
+    .vacancy-description p, .vacancy-description li {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .vacancy-description ul, .vacancy-description ol {
+      padding-left: 20px;
+      margin: 0;
+    }
+    .vacancy-description ul li { margin-bottom: 6px; }
+
+    /* Sidebar card */
+    .vacancy-sidebar {
+      position: sticky;
+      top: 88px;
+    }
+    .sidebar-card {
+      background: var(--bg-2);
+      border-radius: var(--r-xl);
+      padding: 32px 28px;
+    }
+    .sidebar-salary {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .sidebar-salary-lbl { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+    .sidebar-divider { height: 1px; background: var(--border); margin: 20px 0; }
+    .sidebar-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .sidebar-row-lbl { font-size: 13px; color: var(--muted); }
+    .sidebar-row-val { font-size: 14px; font-weight: 600; color: var(--text); text-align: right; }
+    .sidebar-cta { margin-top: 28px; display: flex; flex-direction: column; gap: 10px; }
+    .badge-new {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #34c759;
+      background: rgba(52,199,89,.1);
+      border-radius: 999px;
+      padding: 4px 10px;
+      margin-bottom: 16px;
+    }
+    .badge-new::before {
+      content: '';
+      display: block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #34c759;
+    }
+
+    .not-found {
+      text-align: center;
+      padding: clamp(64px,10vw,140px) 20px;
+    }
+    .not-found h2 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+    .not-found p { margin-bottom: 24px; }
+
+    @media (max-width: 860px) {
+      .vacancy-layout { grid-template-columns: 1fr; }
+      .vacancy-sidebar { position: static; }
+      .sidebar-card { padding: 24px 20px; }
+      .vacancy-cover { aspect-ratio: 16/9; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor" id="cursor" aria-hidden="true"></div>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="container">
+    <div class="header-inner">
+      <a href="aqw-v3.html" class="logo">
+        <span class="logo-mark">AQW</span>
+        <span class="logo-div"></span>
+        <span class="logo-name">Alexx Quality Work</span>
+      </a>
+      <nav class="nav" id="nav">
+        <a href="aqw-v3.html#about">Про нас</a>
+        <a href="aqw-v3.html#process">Як це працює</a>
+        <a href="aqw-jobs.html">Вакансії</a>
+        <a href="aqw-v3.html#news">Новини</a>
+        <a href="aqw-v3.html#team">Команда</a>
+        <a href="aqw-v3.html#contacts">Контакти</a>
+      </nav>
+      <div class="header-right">
+        <a href="tel:+380994768885" class="header-phone">+38 (099) 476 88 85</a>
+        <button class="btn btn-dark btn-sm request-open">Запросити дзвінок</button>
+      </div>
+      <button class="burger" id="burger" aria-label="Меню" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <!-- Content rendered by JS -->
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <a href="aqw-v3.html" class="logo">
+        <span class="logo-mark">AQW</span>
+        <span class="logo-div"></span>
+        <span class="logo-name">Alexx Quality Work</span>
+      </a>
+      <p class="footer-copy">© 2024 Alexx Quality Work · Ліцензована агенція</p>
+    </div>
+  </footer>
+
+  <!-- MODAL -->
+  <div class="modal" id="modal">
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-card">
+      <button class="modal-close" id="modal-close" aria-label="Закрити">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <div id="modal-content">
+        <h3 id="modal-job-title" style="font-size:18px;font-weight:700;margin-bottom:4px;color:var(--muted)"></h3>
+        <h3 style="font-size:22px;font-weight:800;margin-bottom:8px">Залишити заявку</h3>
+        <p style="margin-bottom:24px;color:var(--muted)">Вкажіть ваші дані — ми зв'яжемося найближчим часом.</p>
+        <form id="cb-form" novalidate>
+          <div class="field"><label>Ім'я <span style="color:#ff3b30">*</span></label><input id="cb-name" type="text" placeholder="Ваше ім'я" autocomplete="given-name"><div class="field-err" id="err-name"></div></div>
+          <div class="field"><label>Телефон <span style="color:#ff3b30">*</span></label><input id="cb-phone" type="tel" placeholder="0501234567" autocomplete="tel"><div class="field-err" id="err-phone"></div></div>
+          <button class="btn btn-primary btn-block" id="cb-submit" type="submit">Надіслати заявку</button>
+          <p class="form-note">Натискаючи кнопку, ви погоджуєтесь на обробку персональних даних.</p>
+        </form>
+      </div>
+      <div class="modal-success" id="modal-success" hidden>
+        <div class="success-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Заявку отримано!</h3>
+        <p>Ми зателефонуємо вам найближчим часом.</p>
+        <button class="btn btn-primary" id="modal-ok">Чудово</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./aqw-shared.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    function esc(s) {
+      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ── Read ?id= param ── */
+    var params = new URLSearchParams(location.search);
+    var jobId  = params.get('id');
+    var job    = jobId && window.AQW ? window.AQW.getJob(jobId) : null;
+    var main   = document.getElementById('main-content');
+
+    if (!job) {
+      document.title = 'Вакансія не знайдена — AQW';
+      main.innerHTML =
+        '<div class="container"><div class="not-found">' +
+        '<h2>Вакансію не знайдено</h2>' +
+        '<p>Можливо, вона вже закрита або посилання невірне.</p>' +
+        '<a href="aqw-jobs.html" class="btn btn-primary">← Всі вакансії</a>' +
+        '</div></div>';
+    } else {
+      document.title = esc(job.title) + ' — Alexx Quality Work';
+
+      main.innerHTML =
+        '<div class="vacancy-wrap"><div class="container">' +
+        '<a href="aqw-jobs.html" class="back-link">' +
+        '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Всі вакансії</a>' +
+
+        '<div class="vacancy-layout">' +
+        /* Left */
+        '<div class="vacancy-main">' +
+        '<div class="vacancy-tag">' + esc(job.country) + '</div>' +
+        '<h1 class="vacancy-title">' + esc(job.title) + '</h1>' +
+        '<div class="vacancy-meta">' +
+        '<div class="meta-item"><div class="meta-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.6"/><path d="M12 22s-7-5.686-7-11a7 7 0 1114 0c0 5.314-7 11-7 11z" stroke="currentColor" stroke-width="1.6"/></svg></div>' + esc(job.city) + '</div>' +
+        '<div class="meta-item"><div class="meta-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>' + esc(job.schedule || 'Уточнюється') + '</div>' +
+        '<div class="meta-item"><div class="meta-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' + esc(job.requirements) + '</div>' +
+        '</div>' +
+        (job.image ? '<img class="vacancy-cover" src="' + esc(job.image) + '" alt="' + esc(job.title) + '">' : '') +
+        '<div class="vacancy-description">' + (job.description || '') + '</div>' +
+        '</div>' +
+        /* Right sidebar */
+        '<aside class="vacancy-sidebar">' +
+        '<div class="sidebar-card">' +
+        '<div class="badge-new">Актуальна вакансія</div>' +
+        '<div class="sidebar-salary">' + esc(job.salary) + '</div>' +
+        '<div class="sidebar-salary-lbl">заробітня плата</div>' +
+        '<div class="sidebar-divider"></div>' +
+        '<div class="sidebar-row"><span class="sidebar-row-lbl">Країна</span><span class="sidebar-row-val">' + esc(job.country) + '</span></div>' +
+        '<div class="sidebar-row"><span class="sidebar-row-lbl">Місто</span><span class="sidebar-row-val">' + esc(job.city) + '</span></div>' +
+        '<div class="sidebar-row"><span class="sidebar-row-lbl">Вимоги</span><span class="sidebar-row-val">' + esc(job.requirements) + '</span></div>' +
+        '<div class="sidebar-cta">' +
+        '<button class="btn btn-primary btn-block request-open" data-job="' + esc(job.title) + '">Залишити заявку</button>' +
+        '<a href="tel:+380994768885" class="btn btn-outline btn-block">+38 (099) 476 88 85</a>' +
+        '</div></div>' +
+        '</aside>' +
+        '</div></div></div>';
+    }
+
+    /* ── Header ── */
+    var header = document.getElementById('header');
+    var burger = document.getElementById('burger');
+    var nav    = document.getElementById('nav');
+    window.addEventListener('scroll', function () {
+      header.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+    if (burger && nav) {
+      burger.addEventListener('click', function () {
+        var open = nav.classList.toggle('open');
+        header.classList.toggle('nav-open', open);
+        burger.setAttribute('aria-expanded', String(open));
+      });
+    }
+
+    /* ── Modal ── */
+    var modal    = document.getElementById('modal');
+    var backdrop = document.getElementById('modal-backdrop');
+    var closeBtn = document.getElementById('modal-close');
+    var cbForm   = document.getElementById('cb-form');
+    var cbSubmit = document.getElementById('cb-submit');
+    var cbName   = document.getElementById('cb-name');
+    var cbPhone  = document.getElementById('cb-phone');
+    var errName  = document.getElementById('err-name');
+    var errPhone = document.getElementById('err-phone');
+    var mContent = document.getElementById('modal-content');
+    var mSuccess = document.getElementById('modal-success');
+    var mJobTitle= document.getElementById('modal-job-title');
+
+    function openM(jobLabel) {
+      if (mJobTitle && jobLabel) mJobTitle.textContent = jobLabel;
+      modal.classList.add('is-open');
+      document.body.classList.add('no-scroll');
+      setTimeout(function(){ cbName && cbName.focus(); }, 120);
+    }
+    function closeM() { modal.classList.remove('is-open'); document.body.classList.remove('no-scroll'); }
+    function resetM() { if(cbForm) cbForm.reset(); if(mSuccess) mSuccess.hidden=true; if(mContent) mContent.hidden=false; if(cbSubmit){cbSubmit.disabled=false;cbSubmit.textContent='Надіслати заявку';} }
+
+    document.addEventListener('click', function(e) {
+      var btn = e.target.closest('.request-open');
+      if (btn) openM(btn.dataset.job || (job && job.title) || '');
+    });
+    if(closeBtn) closeBtn.addEventListener('click', closeM);
+    if(backdrop) backdrop.addEventListener('click', closeM);
+    document.getElementById('modal-ok').addEventListener('click', closeM);
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeM(); });
+    if(modal) modal.addEventListener('transitionend', function(){ if(!modal.classList.contains('is-open')) resetM(); });
+
+    if(cbPhone) cbPhone.addEventListener('input', function(){ cbPhone.value = cbPhone.value.replace(/\D/g,'').slice(0,10); });
+
+    if(cbForm) cbForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var name = cbName ? cbName.value.trim() : '';
+      var phone = cbPhone ? cbPhone.value.trim() : '';
+      var ok = true;
+      [errName,errPhone].forEach(function(el){ if(el) el.textContent=''; });
+      [cbName,cbPhone].forEach(function(el){ if(el) el.classList.remove('has-error'); });
+      if(!name){ if(errName) errName.textContent="Введіть ім'я"; if(cbName){cbName.classList.add('has-error');cbName.focus();} ok=false; }
+      if(phone.length!==10){ if(errPhone) errPhone.textContent='Формат: 0501234567'; if(cbPhone) cbPhone.classList.add('has-error'); if(ok&&cbPhone) cbPhone.focus(); ok=false; }
+      if(!ok) return;
+      cbSubmit.disabled=true; cbSubmit.textContent='Відправляємо…';
+      if(window.AQW) window.AQW.addSubmission({name:name, phone:phone, jobId: job ? job.id : null, jobTitle: job ? job.title : '', url:location.href});
+      fetch('/zz-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,phone:phone})}).catch(function(){return{};}).then(function(){ if(mContent) mContent.hidden=true; if(mSuccess) mSuccess.hidden=false; });
+    });
+
+  }());
+  </script>
+</body>
+</html>
