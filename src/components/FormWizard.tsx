@@ -8,6 +8,7 @@ import {
   hasCyrillic,
   isLatin,
 } from "@/lib/form";
+import { compressPhotosForUpload } from "@/lib/compressImage";
 
 type PhotoItem = { id: string; file: File; url: string };
 
@@ -122,6 +123,7 @@ export default function FormWizard({ token }: { token: string | null }) {
   const [inviteLabel, setInviteLabel] = useState("");
   const [data, setData] = useState<FormDataState>(emptyForm);
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
+  const [photosBusy, setPhotosBusy] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -256,20 +258,32 @@ export default function FormWizard({ token }: { token: string | null }) {
     setStep(prev);
   }
 
-  function onPickPhotos(files: FileList | null) {
+  async function onPickPhotos(files: FileList | null) {
     if (!files?.length) return;
     const incoming = Array.from(files).slice(0, 12 - photos.length);
-    const mapped = incoming.map((file) => ({
-      id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
-      file,
-      url: URL.createObjectURL(file),
-    }));
-    setPhotos((prev) => [...prev, ...mapped].slice(0, 12));
-    setErrors((prev) => {
-      const next = { ...prev };
-      delete next.photos;
-      return next;
-    });
+    if (incoming.length === 0) return;
+    setPhotosBusy(true);
+    try {
+      const compressed = await compressPhotosForUpload(incoming);
+      const mapped = compressed.map((file, i) => ({
+        id: `${file.name}-${file.size}-${Date.now()}-${i}`,
+        file,
+        url: URL.createObjectURL(file),
+      }));
+      setPhotos((prev) => [...prev, ...mapped].slice(0, 12));
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.photos;
+        return next;
+      });
+    } catch {
+      setErrors((prev) => ({
+        ...prev,
+        photos: "Не вдалося обробити фото. Спробуйте інший файл.",
+      }));
+    } finally {
+      setPhotosBusy(false);
+    }
   }
 
   function movePhoto(index: number, dir: -1 | 1) {
@@ -301,6 +315,18 @@ export default function FormWizard({ token }: { token: string | null }) {
     setSubmitting(true);
     setSubmitError("");
     try {
+      // ще раз стискаємо пакет під ліміт Vercel перед відправкою
+      const uploadFiles = await compressPhotosForUpload(
+        photos.map((p) => p.file),
+        3_200_000,
+      );
+      const total = uploadFiles.reduce((s, f) => s + f.size, 0);
+      if (total > 4_200_000) {
+        throw new Error(
+          "Фото все ще завеликі. Видаліть зайві або залиште 2–4 чіткі фото документа.",
+        );
+      }
+
       const fd = new FormData();
       fd.append("token", token);
       fd.append("residence_country", data.residence_country || "Угорщина");
@@ -333,7 +359,7 @@ export default function FormWizard({ token }: { token: string | null }) {
       for (const key of qKeys) {
         fd.append(`hungary_questionnaire[${key}]`, String(data[key] ?? ""));
       }
-      photos.forEach((p) => fd.append("photos[]", p.file));
+      uploadFiles.forEach((file) => fd.append("photos[]", file));
 
       const res = await fetch("/api/submit", { method: "POST", body: fd });
       const json = await res.json().catch(() => ({}));
@@ -708,16 +734,18 @@ export default function FormWizard({ token }: { token: string | null }) {
               <p className="lead">
                 Додайте фото по порядку: спершу головна сторінка паспорта, далі
                 штампи / інші сторінки. Порядок можна змінити стрілками ↑ ↓.
+                Фото автоматично стискаються перед відправкою.
               </p>
               <label className="drop">
-                <strong>Натисніть, щоб додати фото</strong>
-                <span className="drop-sub">JPG / PNG / WEBP · до 12 файлів</span>
+                <strong>{photosBusy ? "Обробляємо фото…" : "Натисніть, щоб додати фото"}</strong>
+                <span className="drop-sub">JPG / PNG / WEBP · до 12 файлів · стиснення авто</span>
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
                   multiple
+                  disabled={photosBusy}
                   onChange={(e) => {
-                    onPickPhotos(e.target.files);
+                    void onPickPhotos(e.target.files);
                     e.target.value = "";
                   }}
                 />
