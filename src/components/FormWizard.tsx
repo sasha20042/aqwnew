@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   emptyForm,
   FormDataState,
+  formatSubmitError,
   hasCyrillic,
   isLatin,
 } from "@/lib/form";
@@ -118,6 +119,7 @@ export default function FormWizard({ token }: { token: string | null }) {
     "loading" | "ok" | "bad" | "missing"
   >(token ? "loading" : "missing");
   const [inviteError, setInviteError] = useState("");
+  const [inviteLabel, setInviteLabel] = useState("");
   const [data, setData] = useState<FormDataState>(emptyForm);
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -136,6 +138,9 @@ export default function FormWizard({ token }: { token: string | null }) {
           setInviteState("bad");
           setInviteError(json.message || "Посилання недоступне.");
           return;
+        }
+        if (typeof json.label === "string" && json.label.trim()) {
+          setInviteLabel(json.label.trim());
         }
         setInviteState("ok");
       } catch {
@@ -178,7 +183,7 @@ export default function FormWizard({ token }: { token: string | null }) {
     for (const key of keys) {
       const val = String(data[key] ?? "");
       if (!val.trim()) continue;
-      if (key === "current_address" || key === "document_type" || key === "document_number") {
+      if (key === "document_type" || key === "document_number") {
         if (hasCyrillic(val)) next[key] = "Лише латиниця, без кирилиці.";
       } else if (!isLatin(val)) {
         next[key] = "Лише латинські літери (A–Z).";
@@ -200,7 +205,7 @@ export default function FormWizard({ token }: { token: string | null }) {
       Object.assign(next, validateLatinKeys(["nationality", "country_of_birth", "place_of_birth"]));
     }
     if (current === "docs") {
-      Object.assign(next, validateLatinKeys(["document_type", "document_number", "current_address"]));
+      Object.assign(next, validateLatinKeys(["document_type", "document_number"]));
       if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
         next.email = "Некоректна електронна пошта.";
       }
@@ -313,7 +318,6 @@ export default function FormWizard({ token }: { token: string | null }) {
         "document_type",
         "document_number",
         "email",
-        "current_address",
         "has_foreign_passport",
         "has_direct_border_stamp",
         "left_via_other_country",
@@ -333,15 +337,8 @@ export default function FormWizard({ token }: { token: string | null }) {
 
       const res = await fetch("/api/submit", { method: "POST", body: fd });
       const json = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        const msg =
-          json.message ||
-          (json.errors
-            ? Object.values(json.errors as Record<string, string[]>)
-                .flat()
-                .join("\n")
-            : "Не вдалося надіслати анкету.");
-        throw new Error(msg);
+      if (!res.ok || json?.ok === false) {
+        throw new Error(formatSubmitError(json, res.status));
       }
       setStep("done");
     } catch (e) {
@@ -364,7 +361,7 @@ export default function FormWizard({ token }: { token: string | null }) {
             <h1 className="title">Потрібне персональне посилання</h1>
             <p className="lead">
               {inviteError ||
-                "Відкрийте анкету лише за посиланням від вашого менеджера. Без токена форма недоступна."}
+                "Відкрийте анкету за посиланням від менеджера або вашого реферала. Без токена форма недоступна."}
             </p>
           </div>
         </div>
@@ -379,7 +376,7 @@ export default function FormWizard({ token }: { token: string | null }) {
           AQW <span>Legal</span>
         </div>
         <div style={{ color: "var(--muted)", fontSize: "0.85rem", fontWeight: 600 }}>
-          Угорщина · ТЗ
+          {inviteLabel ? `Реферал · ${inviteLabel}` : "Угорщина · ТЗ"}
         </div>
       </div>
       {step !== "done" ? (
@@ -527,7 +524,7 @@ export default function FormWizard({ token }: { token: string | null }) {
           {step === "docs" && (
             <>
               <div className="kicker">Крок 3 · Документ і контакти</div>
-              <h2 className="title">Паспорт і адреса</h2>
+              <h2 className="title">Паспорт і контакти</h2>
               <div className="grid grid-2">
                 <Field label="Тип документа" hint="латиниця" error={errors.document_type}>
                   <input
@@ -556,15 +553,6 @@ export default function FormWizard({ token }: { token: string | null }) {
                     onChange={(e) => setField("residence_country", e.target.value)}
                   />
                 </Field>
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <Field label="Поточна адреса" hint="латиниця" error={errors.current_address}>
-                    <input
-                      value={data.current_address}
-                      onChange={(e) => setField("current_address", e.target.value)}
-                      placeholder="City, street, house..."
-                    />
-                  </Field>
-                </div>
               </div>
               <div className="actions">
                 <button type="button" className="btn btn-ghost" onClick={prevStep}>
@@ -774,7 +762,11 @@ export default function FormWizard({ token }: { token: string | null }) {
               <div className="kicker">Перевірка</div>
               <h2 className="title">Усе вірно?</h2>
               <p className="lead">Після надсилання менеджер перевірить анкету в CRM.</p>
-              {submitError ? <div className="banner banner-error">{submitError}</div> : null}
+              {submitError ? (
+                <div className="banner banner-error" style={{ whiteSpace: "pre-line" }}>
+                  {submitError}
+                </div>
+              ) : null}
               <div className="review">
                 {[
                   ["ПІБ", data.full_name_latin],

@@ -8,7 +8,10 @@ export async function POST(req: NextRequest) {
 
   if (!crmUrl || !apiKey) {
     return NextResponse.json(
-      { ok: false, message: "Сервер форми не налаштовано (CRM_API_URL / CRM_API_KEY)." },
+      {
+        ok: false,
+        message: "Сервер форми не налаштовано (CRM_API_URL / CRM_API_KEY).",
+      },
       { status: 503 },
     );
   }
@@ -30,14 +33,33 @@ export async function POST(req: NextRequest) {
       body: outgoing,
     });
 
-    const data = await res.json().catch(() => ({
-      message: "Помилка відповіді CRM",
-    }));
+    const raw = await res.text();
+    let data: Record<string, unknown> = {};
+    try {
+      data = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+    } catch {
+      data = {
+        message:
+          res.status >= 500
+            ? `Помилка сервера CRM (${res.status}).`
+            : "CRM повернув некоректну відповідь.",
+      };
+    }
+
+    if (!res.ok && !data.message && !data.errors) {
+      data.message = `Не вдалося надіслати анкету (код ${res.status}).`;
+    }
 
     return NextResponse.json(data, { status: res.status });
-  } catch {
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : "";
     return NextResponse.json(
-      { ok: false, message: "Не вдалося надіслати анкету в CRM." },
+      {
+        ok: false,
+        message: detail
+          ? `Не вдалося звʼязатися з CRM: ${detail}`
+          : "Не вдалося надіслати анкету в CRM.",
+      },
       { status: 502 },
     );
   }
