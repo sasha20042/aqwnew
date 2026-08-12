@@ -76,7 +76,7 @@ function Field({
   return (
     <div className={`field ${error ? "error" : ""}`}>
       <label>
-        {label}
+        <span>{label}</span>
         {hint ? <span className="hint">{hint}</span> : null}
       </label>
       {children}
@@ -89,13 +89,15 @@ function ChoiceGroup<T extends string>({
   value,
   options,
   onChange,
+  row = false,
 }: {
   value: T | "";
   options: ReadonlyArray<{ value: T; label: string }>;
   onChange: (v: T) => void;
+  row?: boolean;
 }) {
   return (
-    <div className="choice-grid">
+    <div className={`choice-grid ${row ? "choice-row" : ""}`}>
       {options.map((o) => (
         <button
           key={o.value}
@@ -415,7 +417,7 @@ export default function FormWizard({ token }: { token: string | null }) {
                   <input
                     value={data.full_name_latin}
                     onChange={(e) => setField("full_name_latin", e.target.value)}
-                    placeholder="Bertych Oleksandr"
+                    placeholder="Taras Shevchenko"
                     autoComplete="name"
                   />
                 </Field>
@@ -472,6 +474,7 @@ export default function FormWizard({ token }: { token: string | null }) {
                     value={data.sex}
                     options={sexOptions}
                     onChange={(v) => setField("sex", v)}
+                    row
                   />
                 </Field>
                 <Field label="Сімейний стан">
@@ -587,6 +590,7 @@ export default function FormWizard({ token }: { token: string | null }) {
                     value={data.has_foreign_passport}
                     options={yesNo}
                     onChange={(v) => setField("has_foreign_passport", v)}
+                    row
                   />
                 </Field>
                 <Field
@@ -597,6 +601,7 @@ export default function FormWizard({ token }: { token: string | null }) {
                     value={data.has_direct_border_stamp}
                     options={yesNo}
                     onChange={(v) => setField("has_direct_border_stamp", v)}
+                    row
                   />
                 </Field>
               </div>
@@ -624,6 +629,7 @@ export default function FormWizard({ token }: { token: string | null }) {
                     value={data.left_via_other_country}
                     options={yesNo}
                     onChange={(v) => setField("left_via_other_country", v)}
+                    row
                   />
                 </Field>
 
@@ -675,6 +681,7 @@ export default function FormWizard({ token }: { token: string | null }) {
                     value={data.official_ukraine_crossing}
                     options={yesNo}
                     onChange={(v) => setField("official_ukraine_crossing", v)}
+                    row
                   />
                 </Field>
                 <Field label="Якщо немає печатки / нестандартний перетин — оберіть ситуацію">
@@ -716,14 +723,11 @@ export default function FormWizard({ token }: { token: string | null }) {
               </p>
               <label className="drop">
                 <strong>Натисніть, щоб додати фото</strong>
-                <span style={{ color: "var(--muted)", fontSize: "0.9rem" }}>
-                  JPG / PNG / WEBP · до 12 файлів
-                </span>
+                <span className="drop-sub">JPG / PNG / WEBP · до 12 файлів</span>
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
                   multiple
-                  hidden
                   onChange={(e) => {
                     onPickPhotos(e.target.files);
                     e.target.value = "";
