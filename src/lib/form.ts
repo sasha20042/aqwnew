@@ -86,6 +86,8 @@ const FIELD_LABELS: Record<string, string> = {
   photos: "Фото",
   "photos.0": "Фото",
   residence_country: "Країна перебування",
+  privacy_policy_accepted: "Політика конфіденційності",
+  personal_data_consent: "Згода на обробку даних",
   "hungary_questionnaire.full_name_latin": "ПІБ",
   "hungary_questionnaire.phone": "Телефон",
   "hungary_questionnaire.email": "Email",

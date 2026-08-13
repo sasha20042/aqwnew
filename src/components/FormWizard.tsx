@@ -128,6 +128,9 @@ export default function FormWizard({ token }: { token: string | null }) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [dataProcessingConsent, setDataProcessingConsent] = useState(false);
+  const [consentError, setConsentError] = useState("");
 
   const statusHref = useMemo(() => {
     return token ? `/status?t=${encodeURIComponent(token)}` : "/status";
@@ -321,6 +324,13 @@ export default function FormWizard({ token }: { token: string | null }) {
       setStep("photos");
       return;
     }
+    if (!privacyAccepted || !dataProcessingConsent) {
+      setConsentError(
+        "Щоб надіслати анкету, підтвердіть політику конфіденційності та згоду на обробку персональних даних.",
+      );
+      return;
+    }
+    setConsentError("");
     setSubmitting(true);
     setSubmitError("");
     try {
@@ -339,6 +349,9 @@ export default function FormWizard({ token }: { token: string | null }) {
       const fd = new FormData();
       fd.append("token", token);
       fd.append("residence_country", data.residence_country || "Угорщина");
+      fd.append("privacy_policy_accepted", "1");
+      fd.append("personal_data_consent", "1");
+      fd.append("gdpr_consent_at", new Date().toISOString());
       const qKeys: (keyof FormDataState)[] = [
         "full_name_latin",
         "phone",
@@ -869,11 +882,59 @@ export default function FormWizard({ token }: { token: string | null }) {
                   </div>
                 ))}
               </div>
+
+              <div className="consent-box" role="group" aria-labelledby="gdpr-consent-title">
+                <div id="gdpr-consent-title" className="kicker" style={{ marginBottom: 0 }}>
+                  GDPR · згода
+                </div>
+                <label className={`consent-item ${consentError && !privacyAccepted ? "error" : ""}`}>
+                  <input
+                    type="checkbox"
+                    checked={privacyAccepted}
+                    onChange={(e) => {
+                      setPrivacyAccepted(e.target.checked);
+                      setConsentError("");
+                    }}
+                  />
+                  <span>
+                    Я ознайомився(лась) з{" "}
+                    <Link href="/privacy" target="_blank" rel="noopener noreferrer">
+                      Політикою конфіденційності
+                    </Link>{" "}
+                    і розумію, як обробляються мої персональні дані. *
+                  </span>
+                </label>
+                <label
+                  className={`consent-item ${consentError && !dataProcessingConsent ? "error" : ""}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={dataProcessingConsent}
+                    onChange={(e) => {
+                      setDataProcessingConsent(e.target.checked);
+                      setConsentError("");
+                    }}
+                  />
+                  <span>
+                    Даю згоду на обробку моїх персональних даних (включно з
+                    фото документів) для прийняття та ведення анкети тимчасового
+                    захисту в Угорщині згідно з GDPR. Згоду можна відкликати,
+                    написавши на контакт з політики конфіденційності. *
+                  </span>
+                </label>
+                {consentError ? <div className="err">{consentError}</div> : null}
+              </div>
+
               <div className="actions">
                 <button type="button" className="btn btn-ghost" onClick={prevStep} disabled={submitting}>
                   Назад
                 </button>
-                <button type="button" className="btn btn-primary" onClick={submit} disabled={submitting}>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={submit}
+                  disabled={submitting || !privacyAccepted || !dataProcessingConsent}
+                >
                   {submitting ? "Надсилаємо…" : "Надіслати анкету"}
                 </button>
               </div>
@@ -890,6 +951,14 @@ export default function FormWizard({ token }: { token: string | null }) {
               </p>
             </>
           )}
+
+          {step !== "done" ? (
+            <p className="form-footer-link">
+              <Link href="/privacy" target="_blank" rel="noopener noreferrer">
+                Політика конфіденційності (GDPR)
+              </Link>
+            </p>
+          ) : null}
         </div>
       </div>
     </div>
