@@ -18,7 +18,7 @@ export default function PrivacyPage() {
     <div className="shell">
       <div className="topbar">
         <Link href="/" className="brand">
-          Анкета <span>ТЗ</span>
+          Ideiglenes <span>védelem</span>
         </Link>
         <div className="topbar-meta">Конфіденційність</div>
       </div>

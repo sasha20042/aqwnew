@@ -405,7 +405,7 @@ export default function FormWizard({ token }: { token: string | null }) {
       <div className="shell">
         <div className="topbar">
           <div className="brand">
-            Анкета <span>ТЗ</span>
+            Ideiglenes <span>védelem</span>
           </div>
           <div className="topbar-meta">Угорщина</div>
         </div>
@@ -436,7 +436,7 @@ export default function FormWizard({ token }: { token: string | null }) {
       <div className="shell">
         <div className="topbar">
           <div className="brand">
-            Анкета <span>ТЗ</span>
+            Ideiglenes <span>védelem</span>
           </div>
           <div className="topbar-meta">Угорщина</div>
         </div>
@@ -463,7 +463,7 @@ export default function FormWizard({ token }: { token: string | null }) {
     <div className="shell">
       <div className="topbar">
         <div className="brand">
-          Анкета <span>ТЗ</span>
+          Ideiglenes <span>védelem</span>
         </div>
         <div className="topbar-meta">
           {inviteLabel ? `Реферал · ${inviteLabel}` : "Угорщина"}

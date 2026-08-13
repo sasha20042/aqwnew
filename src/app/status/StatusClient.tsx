@@ -47,7 +47,7 @@ export default function StatusClient() {
     <div className="shell">
       <div className="topbar">
         <div className="brand">
-          Анкета <span>ТЗ</span>
+          Ideiglenes <span>védelem</span>
         </div>
         <div className="topbar-meta">Статус</div>
       </div>
