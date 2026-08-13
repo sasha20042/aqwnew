@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
   emptyForm,
@@ -117,7 +118,7 @@ function ChoiceGroup<T extends string>({
 export default function FormWizard({ token }: { token: string | null }) {
   const [step, setStep] = useState<Step>("start");
   const [inviteState, setInviteState] = useState<
-    "loading" | "ok" | "bad" | "missing"
+    "loading" | "ok" | "bad" | "used" | "missing"
   >(token ? "loading" : "missing");
   const [inviteError, setInviteError] = useState("");
   const [inviteLabel, setInviteLabel] = useState("");
@@ -128,6 +129,10 @@ export default function FormWizard({ token }: { token: string | null }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
+  const statusHref = useMemo(() => {
+    return token ? `/status?t=${encodeURIComponent(token)}` : "/status";
+  }, [token]);
+
   useEffect(() => {
     if (!token) return;
     let cancelled = false;
@@ -137,8 +142,12 @@ export default function FormWizard({ token }: { token: string | null }) {
         const json = await res.json();
         if (cancelled) return;
         if (!res.ok || !json.ok) {
-          setInviteState("bad");
-          setInviteError(json.message || "Посилання недоступне.");
+          const msg = json.message || "Посилання недоступне.";
+          const used =
+            res.status === 410 &&
+            (json.reason === "used" || /використано/i.test(String(msg)));
+          setInviteState(used ? "used" : "bad");
+          setInviteError(msg);
           return;
         }
         if (typeof json.label === "string" && json.label.trim()) {
@@ -378,9 +387,50 @@ export default function FormWizard({ token }: { token: string | null }) {
     return <div className="loading">Перевіряємо посилання…</div>;
   }
 
+  if (inviteState === "used") {
+    return (
+      <div className="shell">
+        <div className="topbar">
+          <div className="brand">
+            AQW <span>Legal</span>
+          </div>
+          <div style={{ color: "var(--muted)", fontSize: "0.85rem", fontWeight: 600 }}>
+            Угорщина · ТЗ
+          </div>
+        </div>
+        <div className="stage">
+          <div className="card">
+            <div className="kicker">Посилання</div>
+            <h1 className="title">Анкету вже надіслано</h1>
+            <p className="lead">
+              {inviteError ||
+                "Це одноразове посилання вже використано. Нову анкету за ним подати неможливо."}
+            </p>
+            <p className="lead" style={{ marginTop: "0.35rem" }}>
+              Можете перевірити статус своєї анкети за номером телефону.
+            </p>
+            <div className="actions">
+              <Link href={statusHref} className="btn btn-primary">
+                Перевірити статус анкети
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (inviteState === "missing" || inviteState === "bad") {
     return (
       <div className="shell">
+        <div className="topbar">
+          <div className="brand">
+            AQW <span>Legal</span>
+          </div>
+          <div style={{ color: "var(--muted)", fontSize: "0.85rem", fontWeight: 600 }}>
+            Угорщина · ТЗ
+          </div>
+        </div>
         <div className="stage">
           <div className="card">
             <div className="kicker">Доступ</div>
@@ -389,6 +439,11 @@ export default function FormWizard({ token }: { token: string | null }) {
               {inviteError ||
                 "Відкрийте анкету за посиланням від менеджера або вашого реферала. Без токена форма недоступна."}
             </p>
+            <div className="actions">
+              <Link href={statusHref} className="btn btn-ghost">
+                Перевірити статус анкети
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -423,6 +478,9 @@ export default function FormWizard({ token }: { token: string | null }) {
                 після надсилання.
               </p>
               <div className="actions">
+                <Link href={statusHref} className="btn btn-ghost">
+                  Перевірити статус анкети
+                </Link>
                 <button type="button" className="btn btn-primary" onClick={() => setStep("identity")}>
                   Почати
                 </button>

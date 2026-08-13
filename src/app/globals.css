@@ -236,6 +236,10 @@ textarea {
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn:active {
@@ -419,6 +423,11 @@ textarea {
 .banner-ok {
   background: rgba(4, 120, 87, 0.08);
   color: var(--ok);
+}
+
+.banner-info {
+  background: rgba(15, 23, 42, 0.05);
+  color: #334155;
 }
 
 .loading {
