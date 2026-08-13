@@ -11,16 +11,16 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   const { name, email, address } = dataController;
+  const controllerLabel =
+    name || "оператор цієї онлайн-анкети тимчасового захисту в Угорщині";
 
   return (
     <div className="shell">
       <div className="topbar">
         <Link href="/" className="brand">
-          AQW <span>Legal</span>
+          Анкета <span>ТЗ</span>
         </Link>
-        <div style={{ color: "var(--muted)", fontSize: "0.85rem", fontWeight: 600 }}>
-          GDPR · Privacy
-        </div>
+        <div className="topbar-meta">Конфіденційність</div>
       </div>
 
       <div className="stage">
@@ -28,10 +28,10 @@ export default function PrivacyPage() {
           <div className="kicker">GDPR · ст. 12–14</div>
           <h1 className="title">Політика конфіденційності</h1>
           <p className="lead">
-            Цей документ пояснює, як {name} збирає, використовує та захищає ваші
-            персональні дані під час заповнення онлайн-анкети тимчасового захисту
-            в Угорщині. Структура відповідає публічному шаблону privacy notice
-            GDPR.eu (ст. 13 GDPR).
+            Цей документ пояснює, як ми збираємо, використовуємо та захищаємо
+            ваші персональні дані під час заповнення онлайн-анкети тимчасового
+            захисту в Угорщині. Структура відповідає публічному шаблону privacy
+            notice GDPR.eu (ст. 13 GDPR).
           </p>
           <p className="privacy-meta">Останнє оновлення: {privacyPolicyUpdatedAt}</p>
 
@@ -51,15 +51,23 @@ export default function PrivacyPage() {
           <section id="controller">
             <h2>1. Хто є контролером персональних даних</h2>
             <p>
-              Контролер (володілець) персональних даних — <strong>{name}</strong>
-              , оператор цієї онлайн-анкети та повʼязаної CRM-системи для
-              підготовки матеріалів щодо тимчасового захисту в Угорщині.
+              Контролер (володілець) персональних даних —{" "}
+              <strong>{controllerLabel}</strong>. Дані обробляються для
+              підготовки та ведення матеріалів щодо тимчасового захисту в
+              Угорщині.
             </p>
             <ul>
-              <li>
-                Email для запитів щодо персональних даних:{" "}
-                <a href={`mailto:${email}`}>{email}</a>
-              </li>
+              {email ? (
+                <li>
+                  Email для запитів щодо персональних даних:{" "}
+                  <a href={`mailto:${email}`}>{email}</a>
+                </li>
+              ) : (
+                <li>
+                  Запити щодо персональних даних надсилайте менеджеру, який
+                  надіслав вам посилання на анкету.
+                </li>
+              )}
               {address ? <li>Адреса: {address}</li> : null}
             </ul>
           </section>
@@ -161,8 +169,8 @@ export default function PrivacyPage() {
             <h2>6. Кому ми можемо передавати дані</h2>
             <ul>
               <li>
-                уповноваженим менеджерам / виконавцям {name}, які працюють із
-                вашою справою;
+                уповноваженим менеджерам і виконавцям, які працюють із вашою
+                справою;
               </li>
               <li>
                 постачальникам хостингу та інфраструктури (CRM, хмарне
@@ -231,9 +239,16 @@ export default function PrivacyPage() {
               </li>
             </ul>
             <p>
-              Щоб реалізувати права, напишіть на{" "}
-              <a href={`mailto:${email}`}>{email}</a>. Ми відповімо протягом{" "}
-              <strong>одного місяця</strong> (ст. 12 GDPR).
+              Щоб реалізувати права,{" "}
+              {email ? (
+                <>
+                  напишіть на <a href={`mailto:${email}`}>{email}</a>
+                </>
+              ) : (
+                <>зверніться до менеджера, який надіслав вам посилання</>
+              )}
+              . Ми відповімо протягом <strong>одного місяця</strong> (ст. 12
+              GDPR).
             </p>
           </section>
 
@@ -251,7 +266,12 @@ export default function PrivacyPage() {
             <h2>10. Контакти та наглядовий орган</h2>
             <p>
               Питання щодо цієї політики та обробки даних:{" "}
-              <a href={`mailto:${email}`}>{email}</a>.
+              {email ? (
+                <a href={`mailto:${email}`}>{email}</a>
+              ) : (
+                <>через менеджера, який надіслав вам посилання на анкету</>
+              )}
+              .
             </p>
             <p>
               Якщо ви вважаєте, що ваші права порушено, ви маєте право подати

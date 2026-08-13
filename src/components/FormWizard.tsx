@@ -405,11 +405,9 @@ export default function FormWizard({ token }: { token: string | null }) {
       <div className="shell">
         <div className="topbar">
           <div className="brand">
-            AQW <span>Legal</span>
+            Анкета <span>ТЗ</span>
           </div>
-          <div style={{ color: "var(--muted)", fontSize: "0.85rem", fontWeight: 600 }}>
-            Угорщина · ТЗ
-          </div>
+          <div className="topbar-meta">Угорщина</div>
         </div>
         <div className="stage">
           <div className="card">
@@ -438,11 +436,9 @@ export default function FormWizard({ token }: { token: string | null }) {
       <div className="shell">
         <div className="topbar">
           <div className="brand">
-            AQW <span>Legal</span>
+            Анкета <span>ТЗ</span>
           </div>
-          <div style={{ color: "var(--muted)", fontSize: "0.85rem", fontWeight: 600 }}>
-            Угорщина · ТЗ
-          </div>
+          <div className="topbar-meta">Угорщина</div>
         </div>
         <div className="stage">
           <div className="card">
@@ -467,10 +463,10 @@ export default function FormWizard({ token }: { token: string | null }) {
     <div className="shell">
       <div className="topbar">
         <div className="brand">
-          AQW <span>Legal</span>
+          Анкета <span>ТЗ</span>
         </div>
-        <div style={{ color: "var(--muted)", fontSize: "0.85rem", fontWeight: 600 }}>
-          {inviteLabel ? `Реферал · ${inviteLabel}` : "Угорщина · ТЗ"}
+        <div className="topbar-meta">
+          {inviteLabel ? `Реферал · ${inviteLabel}` : "Угорщина"}
         </div>
       </div>
       {step !== "done" ? (

@@ -47,11 +47,9 @@ export default function StatusClient() {
     <div className="shell">
       <div className="topbar">
         <div className="brand">
-          AQW <span>Legal</span>
+          Анкета <span>ТЗ</span>
         </div>
-        <div style={{ color: "var(--muted)", fontSize: "0.85rem", fontWeight: 600 }}>
-          Статус анкети
-        </div>
+        <div className="topbar-meta">Статус</div>
       </div>
 
       <div className="stage">
