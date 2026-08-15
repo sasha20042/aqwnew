@@ -12,7 +12,6 @@ type Briefing = {
   documents?: { label?: string; items?: string[]; note?: string };
   contacts?: {
     label?: string;
-    coordinator?: { name?: string; role?: string; phone?: string };
     executor?: { name?: string | null; role?: string; phone?: string | null } | null;
   };
 };
@@ -134,7 +133,6 @@ function BriefingCard({ briefing }: { briefing: Briefing }) {
   const arrival = briefing.arrival;
   const docs = briefing.documents;
   const contacts = briefing.contacts;
-  const coordinator = contacts?.coordinator;
   const executor = contacts?.executor;
 
   return (
@@ -178,28 +176,19 @@ function BriefingCard({ briefing }: { briefing: Briefing }) {
 
         <article className="status-briefing__block status-briefing__block--contacts">
           <h3>{contacts?.label || "Контакти"}</h3>
-          {coordinator ? (
-            <div className="status-contact">
-              <div className="status-contact__name">{coordinator.name}</div>
-              <div className="status-contact__role">{coordinator.role}</div>
-              {coordinator.phone ? (
-                <a className="status-contact__phone" href={`tel:${coordinator.phone.replace(/\s+/g, "")}`}>
-                  {coordinator.phone}
-                </a>
-              ) : null}
-            </div>
-          ) : null}
           {executor && (executor.name || executor.phone) ? (
             <div className="status-contact">
-              <div className="status-contact__name">{executor.name || "Виконавець"}</div>
-              <div className="status-contact__role">{executor.role || "Виконавець"}</div>
+              <div className="status-contact__name">{executor.name || "Координатор"}</div>
+              <div className="status-contact__role">{executor.role || "Координатор"}</div>
               {executor.phone ? (
                 <a className="status-contact__phone" href={`tel:${executor.phone.replace(/\s+/g, "")}`}>
                   {executor.phone}
                 </a>
               ) : null}
             </div>
-          ) : null}
+          ) : (
+            <p className="status-briefing__note">Контакт координатора зʼявиться після призначення дати подачі.</p>
+          )}
         </article>
       </div>
     </section>
